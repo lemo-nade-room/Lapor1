@@ -15,5 +15,7 @@ Deno.test("読み取りエラー", () => {
     assertThrows(() => UnitPath.make(""), InvalidPathPhraseError)
     assertThrows(() => UnitPath.make("*"), InvalidPathPhraseError)
     assertThrows(() => UnitPath.make("**"), InvalidPathPhraseError)
+    assertThrows(() => UnitPath.make("hello/morning"), InvalidPathPhraseError)
+    assertThrows(() => UnitPath.make("?hello=morning"), InvalidPathPhraseError)
 })
 
