@@ -22,13 +22,25 @@ export class RoutingCollection implements IRoutingCollection {
     }
 
     public readonly handle = async (method: HTTPMethod, paths: Paths, req: Request): Promise<Response> => {
-        const route = this.routes.find(route => route.isPath(paths.nextPath))
-        if (route === undefined) throw Abort.notFound;
-        return await route.handle(method, paths.nextPaths, req)
+        const route = this.matchRoute(paths.nextPath)
+        if (route) return await route.handle(method, paths.nextPaths, req)
+
+        const anythingRoute = this.anythingRoute()
+        if (anythingRoute) return await anythingRoute.handle(method, paths.nextPaths, req)
+
+        throw Abort.notFound
     }
 
     private readonly has = (path: UnitPath): boolean => {
         return this.routes.some(routing => routing.isPath(path))
+    }
+
+    private readonly matchRoute = (path: UnitPath): Routing | undefined => {
+        return this.routes.find(route => route.isPath(path))
+    }
+
+    private readonly anythingRoute = (): Routing | undefined => {
+        return this.routes.find(route => route.isAnything)
     }
 
     private readonly routeAdded = (path: UnitPath): RoutingCollection => {

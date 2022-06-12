@@ -1,4 +1,4 @@
-import { assertStrictEquals } from "https://deno.land/std@0.65.0/testing/asserts.ts"
+import { assert, assertStrictEquals } from "https://deno.land/std@0.65.0/testing/asserts.ts"
 import { Routing } from "./routing.ts"
 import { UnitPath } from "../path/unit/unitPath.ts"
 import { HttpHandlers } from "../../../handler/http/each/httpHandlers.ts"
@@ -46,4 +46,21 @@ Deno.test("setとhandle", async () => {
     response = await routing.handle(HTTPMethod.POST, Paths.make(['how']), request)
     assertStrictEquals(response, "Collection Handle")
 
+})
+
+Deno.test('isAnythingの確認', () => {
+    const anythingRouting = new Routing(
+        UnitPath.make("*"),
+        new HttpHandlers(),
+        new MockRouteCollection()
+    )
+
+    const normalRouting = new Routing(
+        UnitPath.make("hello"),
+        new HttpHandlers(),
+        new MockRouteCollection()
+    )
+
+    assert(anythingRouting.isAnything)
+    assert(!normalRouting.isAnything)
 })

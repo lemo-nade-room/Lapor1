@@ -62,3 +62,30 @@ Deno.test('一連のテスト', async () => {
 
     assertStrictEquals(result.value, 'authaAclear')
 })
+
+Deno.test('anythingのルーティング', async () => {
+    const lRoutesBuilder = LRoutesBuilder.init()
+    lRoutesBuilder.get(async () => 'Root')
+    lRoutesBuilder.get('one', async () => 'one')
+    lRoutesBuilder.get(['one', '*'], async () => 'anything')
+    lRoutesBuilder.get(['one', '*', 'three'], async () => 'anything three')
+    lRoutesBuilder.get(['one', 'two'], async () => 'one two')
+    lRoutesBuilder.get(['one', 'two', 'three'], async () => 'one two three')
+
+    const req = undefined as any
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make([]), req),
+        'Root'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one']), req),
+        'one'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'xxx']), req),
+        'anything'
+    )
+})

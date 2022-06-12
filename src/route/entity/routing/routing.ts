@@ -28,6 +28,10 @@ export class Routing {
 
     public readonly isPath = (path: UnitPath): boolean => this.path.equals(path)
 
+    public get isAnything(): boolean {
+        return this.path.isAnything
+    }
+
     public readonly setHttpHandler = (method: HTTPMethod, paths: Paths, middlewares: LMiddlewares, handler: HttpHandler): Routing => {
         if (paths.isCurrent) return this.setCurrentHttpHandler(method, middlewares, handler)
         return this.setHttpHandlerNextRoutingCollection(method, paths, middlewares, handler)

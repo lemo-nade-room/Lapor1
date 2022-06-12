@@ -10,6 +10,7 @@ import { HttpHandler } from "../handler/http/httpHandler.ts"
 import { Paths } from "../route/entity/path/collection/paths.ts"
 import { Request } from "../request/request.ts"
 import { Response } from "../response/response.ts"
+import { SessionMiddleware } from "../session/middleware/sessionMiddleware.ts"
 
 export class LApplication implements Application {
 
@@ -61,10 +62,10 @@ export class LApplication implements Application {
     // 未実装
     public get sessions(): Sessions {
         return new class implements Sessions {
-            get middleware() {
-                return undefined;
+            get middleware(): SessionMiddleware {
+                return new SessionMiddleware;
             }
-        }
+        }()
     }
 
     public readonly webSocket = (paths: string[], onUpgrade: WebSocketOnUpgrade): void => {

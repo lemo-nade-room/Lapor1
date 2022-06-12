@@ -23,3 +23,7 @@ Deno.test('**が最後以外に来るか', () => {
     assert(!UnitPath.make('a').isCatcall)
 })
 
+Deno.test('isAnythingの確認', () => {
+    assert(UnitPath.make("*").isAnything)
+    assert(!UnitPath.make("a").isAnything)
+})

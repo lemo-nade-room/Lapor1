@@ -17,6 +17,10 @@ export class UnitPath {
 
     public readonly equals = (compared: UnitPath): boolean => this.path === compared.path
 
+    public get isAnything(): boolean {
+        return this.equals(UnitPath.anything)
+    }
+
     public get isCatcall(): boolean {
         return this.equals(UnitPath.catcall)
     }
