@@ -22,13 +22,13 @@ export class RoutingCollection implements IRoutingCollection {
     }
 
     public readonly handle = async (method: HTTPMethod, paths: Paths, req: Request): Promise<Response> => {
-        const route = this.matchRoute(paths.nextPath)
+        const route = this.httpRouting(paths.nextPath)
         if (route) return await route.handle(method, paths.nextPaths, req)
-
-        const anythingRoute = this.anythingRoute()
-        if (anythingRoute) return await anythingRoute.handle(method, paths.nextPaths, req)
-
         throw Abort.notFound
+    }
+
+    private readonly httpRouting = (path: UnitPath): Routing | undefined => {
+        return this.matchRoute(path) ?? this.anythingRoute()
     }
 
     private readonly has = (path: UnitPath): boolean => {
