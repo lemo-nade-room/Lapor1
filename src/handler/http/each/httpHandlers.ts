@@ -28,7 +28,7 @@ export class HttpHandlers {
 
     private readonly duplicateWarningLogger = (method: HTTPMethod): void => {
         if (this.handlers.hasOwnProperty(method.symbol)) {
-            console.log("duplicate method registered")
+            console.log("[Warning]: duplicate method registered")
         }
     }
 }
