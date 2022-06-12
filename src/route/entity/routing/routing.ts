@@ -8,21 +8,28 @@ import { Paths } from "../path/collection/paths.ts"
 import { LMiddlewares } from "../../../middleware/entity/middlewares/lMiddlewares.ts"
 import { Request } from "../../../request/request.ts"
 import { Response } from "../../../response/response.ts"
+import { RoutingCollection } from "./collection/routingCollection.ts"
 
 export class Routing {
 
-    public constructor(
+    private constructor(
         private readonly path: UnitPath,
         private readonly handlers: HttpHandlers,
         private readonly routingCollection: IRoutingCollection,
         private readonly socketHandler?: WebSocketOnUpgrade,
     ) {}
 
-    public static readonly init = (collection: IRoutingCollection): Routing => {
+    public static readonly init = (data: {
+        path?: UnitPath,
+        handlers?: HttpHandlers,
+        routingCollection?: IRoutingCollection,
+        socketHandler?: WebSocketOnUpgrade
+    }): Routing => {
         return new Routing(
-            UnitPath.root,
-            new HttpHandlers(),
-            collection,
+            data.path ?? UnitPath.root,
+            data.handlers ?? new HttpHandlers(),
+            data.routingCollection ?? new RoutingCollection(),
+            data.socketHandler
         )
     }
 

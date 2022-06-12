@@ -2,17 +2,19 @@ import { assertStrictEquals } from "https://deno.land/std@0.65.0/testing/asserts
 import { RoutingCollection } from "./routingCollection.ts"
 import { Routing } from "../routing.ts"
 import { UnitPath } from "../../path/unit/unitPath.ts"
-import { HttpHandlers } from "../../../../handler/http/each/httpHandlers.ts"
 import { HTTPMethod } from "../../../../method/httpMethod.ts"
 import { Paths } from "../../path/collection/paths.ts"
 import { LMiddlewares } from "../../../../middleware/entity/middlewares/lMiddlewares.ts"
 
 Deno.test('RoutingCollection Test', async () => {
     const collection = new RoutingCollection([
-        new Routing(UnitPath.make('hello'), new HttpHandlers(), new RoutingCollection([])),
-        new Routing(UnitPath.make('morning'), new HttpHandlers(), new RoutingCollection([
-            new Routing(UnitPath.make('night'), new HttpHandlers(), new RoutingCollection([])),
-        ]))
+        Routing.init({ path: UnitPath.make('hello') }),
+        Routing.init({
+            path: UnitPath.make('morning'),
+            routingCollection: new RoutingCollection([
+                Routing.init({ path: UnitPath.make('night') })
+            ])
+        })
     ])
         .setHttpHandler(HTTPMethod.GET, Paths.make(['hello']), new LMiddlewares(), async () => 'hello response')
         .setHttpHandler(HTTPMethod.PATCH, Paths.make(['morning']), new LMiddlewares(), async () => 'morning response')

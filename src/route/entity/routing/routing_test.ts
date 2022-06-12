@@ -25,14 +25,14 @@ Deno.test("setとhandle", async () => {
 
     log = ""
 
-    let routing = new Routing(
-        UnitPath.make("hello"),
-        new HttpHandlers()
+    let routing = Routing.init({
+        path: UnitPath.make('hello'),
+        handlers: new HttpHandlers()
             .setHandler(HTTPMethod.GET, new LMiddlewares(), async () => "Hello")
             .setHandler(HTTPMethod.PUT, new LMiddlewares(), async () => "PUT")
             .setHandler(HTTPMethod.DELETE, new LMiddlewares(), async () => "Remove"),
-        new MockRouteCollection()
-    )
+        routingCollection: new MockRouteCollection()
+    })
 
     routing = routing.setHttpHandler(HTTPMethod.POST, Paths.make([]), new LMiddlewares([]), async () => "Add")
     routing = routing.setHttpHandler(HTTPMethod.PATCH, Paths.make(['how']), new LMiddlewares([]), async () => "Oh")
@@ -49,17 +49,9 @@ Deno.test("setとhandle", async () => {
 })
 
 Deno.test('isAnythingの確認', () => {
-    const anythingRouting = new Routing(
-        UnitPath.make("*"),
-        new HttpHandlers(),
-        new MockRouteCollection()
-    )
+    const anythingRouting = Routing.init({ path: UnitPath.make('*') })
 
-    const normalRouting = new Routing(
-        UnitPath.make("hello"),
-        new HttpHandlers(),
-        new MockRouteCollection()
-    )
+    const normalRouting = Routing.init({ path: UnitPath.make('hello') })
 
     assert(anythingRouting.isAnything)
     assert(!normalRouting.isAnything)

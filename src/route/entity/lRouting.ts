@@ -14,7 +14,7 @@ export class LRouting {
     ) {}
 
     public static readonly init = (): LRouting => {
-        return new LRouting(Routing.init(new RoutingCollection()))
+        return new LRouting(Routing.init({ routingCollection: new RoutingCollection() }))
     }
 
     public readonly setHttpHandler = (method: HTTPMethod, paths: Paths, middlewares: LMiddlewares, handler: HttpHandler): void => {

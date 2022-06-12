@@ -5,7 +5,6 @@ import { LMiddlewares } from "../../../../middleware/entity/middlewares/lMiddlew
 import { HttpHandler } from "../../../../handler/http/httpHandler.ts"
 import { Routing } from "../routing.ts"
 import { UnitPath } from "../../path/unit/unitPath.ts"
-import { HttpHandlers } from "../../../../handler/http/each/httpHandlers.ts"
 import { Request } from "../../../../request/request.ts"
 import { Response } from "../../../../response/response.ts"
 import { Abort } from "../../../../error/abort.ts"
@@ -44,11 +43,7 @@ export class RoutingCollection implements IRoutingCollection {
     }
 
     private readonly routeAdded = (path: UnitPath): RoutingCollection => {
-        const additionalRouting = new Routing(
-            path,
-            new HttpHandlers(),
-            new RoutingCollection()
-        )
+        const additionalRouting = Routing.init({ path: path })
         return new RoutingCollection(this.routes.concat([additionalRouting]))
     }
 
