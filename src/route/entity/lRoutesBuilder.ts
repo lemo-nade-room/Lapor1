@@ -23,6 +23,7 @@ export type GroupOverload = {
 export type HttpHandleOverload = {
     (paths: string[], handler: HttpHandler): void
     (path: string, handler: HttpHandler): void
+    (handler: HttpHandler): void
 }
 
 export class LRoutesBuilder implements RoutesBuilder {
@@ -35,24 +36,24 @@ export class LRoutesBuilder implements RoutesBuilder {
 
     public static readonly init = () => new LRoutesBuilder(LRouting.init(), Paths.root, new LMiddlewares())
 
-    public readonly get: HttpHandleOverload = (pathOrPaths, handler) => {
-        this.httpRoute(HTTPMethod.GET, pathOrPaths, handler)
+    public readonly get: HttpHandleOverload = (pathOrPathsOrHandler: string | string[] | HttpHandler, handler?: HttpHandler) => {
+        this.httpRoute(HTTPMethod.GET, pathOrPathsOrHandler, handler)
     }
 
-    public readonly post: HttpHandleOverload = (pathOrPaths, handler) => {
-        this.httpRoute(HTTPMethod.POST, pathOrPaths, handler)
+    public readonly post: HttpHandleOverload = (pathOrPathsOrHandler: string | string[] | HttpHandler, handler?: HttpHandler) => {
+        this.httpRoute(HTTPMethod.POST, pathOrPathsOrHandler, handler)
     }
 
-    public readonly put: HttpHandleOverload = (pathOrPaths, handler) => {
-        this.httpRoute(HTTPMethod.PUT, pathOrPaths, handler)
+    public readonly put: HttpHandleOverload = (pathOrPathsOrHandler: string | string[] | HttpHandler, handler?: HttpHandler) => {
+        this.httpRoute(HTTPMethod.PUT, pathOrPathsOrHandler, handler)
     }
 
-    public readonly patch: HttpHandleOverload = (pathOrPaths, handler) => {
-        this.httpRoute(HTTPMethod.PATCH, pathOrPaths, handler)
+    public readonly patch: HttpHandleOverload = (pathOrPathsOrHandler: string | string[] | HttpHandler, handler?: HttpHandler) => {
+        this.httpRoute(HTTPMethod.PATCH, pathOrPathsOrHandler, handler)
     }
 
-    public readonly delete: HttpHandleOverload = (pathOrPaths, handler) => {
-        this.httpRoute(HTTPMethod.DELETE, pathOrPaths, handler)
+    public readonly delete: HttpHandleOverload = (pathOrPathsOrHandler: string | string[] | HttpHandler, handler?: HttpHandler) => {
+        this.httpRoute(HTTPMethod.DELETE, pathOrPathsOrHandler, handler)
     }
 
     public readonly webSocket = (paths: string[], onUpgrade: WebSocketOnUpgrade): void => {}
@@ -61,13 +62,12 @@ export class LRoutesBuilder implements RoutesBuilder {
         return await this.routing.handle(method, paths, req)
     }
 
-    private readonly httpRoute = (method: HTTPMethod, pathOrPaths: string | string[], handler: HttpHandler): void => {
-        const paths = typeof pathOrPaths === 'string' ? [pathOrPaths] : pathOrPaths
+    public readonly httpRoute = (method: HTTPMethod, pathOrPathsOrHandler: (string | string[] | HttpHandler), handler?: HttpHandler): void => {
         this.routing.setHttpHandler(
             method,
-            this.paths(paths),
+            this.httpRoutePaths(pathOrPathsOrHandler, handler),
             this.middlewares,
-            handler
+            handler ?? pathOrPathsOrHandler as HttpHandler
         )
     }
 
@@ -88,7 +88,17 @@ export class LRoutesBuilder implements RoutesBuilder {
         collection.boot(this)
     }
 
-    private readonly paths = (paths: string[]): Paths => {
+    private readonly httpRoutePaths = (pathOrPathsOrHandler: string | string[] | HttpHandler, handler?: HttpHandler): Paths => {
+        if (typeof pathOrPathsOrHandler === 'string' && handler) {
+            return this.basedPaths([pathOrPathsOrHandler])
+        }
+        if (Array.isArray(pathOrPathsOrHandler) && handler) {
+            return this.basedPaths(pathOrPathsOrHandler)
+        }
+        return this.basedPaths([])
+    }
+
+    private readonly basedPaths = (paths: string[]): Paths => {
         return Paths.make(paths)
             .based(this.base)
     }

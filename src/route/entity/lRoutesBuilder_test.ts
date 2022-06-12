@@ -1,4 +1,4 @@
-import { assert, assertEquals, assertStrictEquals } from "https://deno.land/std@0.65.0/testing/asserts.ts"
+import { assertStrictEquals } from "https://deno.land/std@0.65.0/testing/asserts.ts"
 import { LRoutesBuilder } from "./lRoutesBuilder.ts"
 import { Middleware } from "../../middleware/middleware.ts"
 import { HttpHandler } from "../../handler/http/httpHandler.ts"
@@ -25,7 +25,7 @@ class MyMiddleware implements Middleware {
 
 class LoginController implements RouteCollection {
     boot = (routes: RoutesBuilder): void => {
-        routes.get([], async (_) => "ログイン")
+        routes.get(async (_) => "ログイン")
         routes.delete([], async (_) => "ログアウト")
     }
 }
@@ -52,7 +52,7 @@ Deno.test('一連のテスト', async () => {
     const auth = routesBuilder.grouped('hello').grouped(new MyMiddleware('auth', 'clear', result))
 
     auth.group(new MyMiddleware('a', 'A', result), a => {
-        a.post([], async (_) => 'Hello')
+        a.post( async (_) => 'Hello')
     })
 
     assertStrictEquals(
