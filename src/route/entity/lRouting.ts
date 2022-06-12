@@ -4,6 +4,8 @@ import { HttpHandler } from "../../handler/http/httpHandler.ts"
 import { Routing } from "./routing/routing.ts"
 import { RoutingCollection } from "./routing/collection/routingCollection.ts"
 import { LMiddlewares } from "../../middleware/entity/middlewares/lMiddlewares.ts"
+import { Request } from "../../request/request.ts"
+import { Response } from "../../response/response.ts"
 
 export class LRouting {
 
@@ -19,4 +21,7 @@ export class LRouting {
         this.routing = this.routing.setHttpHandler(method, paths, middlewares, handler)
     }
 
+    public readonly handle = async (method: HTTPMethod, paths: Paths, req: Request): Promise<Response> => {
+        return await this.routing.handle(method, paths, req)
+    }
 }
