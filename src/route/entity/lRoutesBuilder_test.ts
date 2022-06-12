@@ -88,4 +88,19 @@ Deno.test('anythingのルーティング', async () => {
         await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'xxx']), req),
         'anything'
     )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'two']), req),
+        'one two'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'two', 'three']), req),
+        'one two three'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'xxx', 'three']), req),
+        'anything three'
+    )
 })
