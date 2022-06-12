@@ -13,9 +13,13 @@ Deno.test("等価性", () => {
 
 Deno.test("読み取りエラー", () => {
     assertThrows(() => UnitPath.make(""), InvalidPathPhraseError)
-    assertThrows(() => UnitPath.make("*"), InvalidPathPhraseError)
-    assertThrows(() => UnitPath.make("**"), InvalidPathPhraseError)
     assertThrows(() => UnitPath.make("hello/morning"), InvalidPathPhraseError)
     assertThrows(() => UnitPath.make("?hello=morning"), InvalidPathPhraseError)
+})
+
+Deno.test('**が最後以外に来るか', () => {
+    assert(!UnitPath.anything.isCatcall)
+    assert(UnitPath.catcall.isCatcall)
+    assert(!UnitPath.make('a').isCatcall)
 })
 

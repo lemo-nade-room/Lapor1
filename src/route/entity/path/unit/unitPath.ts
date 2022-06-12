@@ -17,12 +17,15 @@ export class UnitPath {
 
     public readonly equals = (compared: UnitPath): boolean => this.path === compared.path
 
+    public get isCatcall(): boolean {
+        return this.equals(UnitPath.catcall)
+    }
+
     private static readonly isValid = (path: string): boolean => {
-        if (this.badPaths.includes(path)) return false
+        if (path === '') return false
         if (this.badCharacters.some(char => path.includes(char))) return false
         return true
     }
 
-    private static readonly badPaths = ['', '*', '**']
     private static readonly badCharacters = ['?', '&', '/', '=', '¥']
 }

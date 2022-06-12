@@ -1,11 +1,16 @@
 import { UnitPath } from "../unit/unitPath.ts"
 import { FrameworkError } from "../../../../error/frameworkError.ts"
+import { InvalidPathPhraseError } from "../../../../error/invalidPathPhraseError.ts"
 
 export class Paths {
 
     public constructor(
         private readonly paths: UnitPath[]
-    ) {}
+    ) {
+        const popped = paths.slice(0, paths.length-1)
+        const isIncludeWiledCard = popped.some(path => path.isCatcall)
+        if (isIncludeWiledCard) throw new InvalidPathPhraseError()
+    }
 
     public static readonly make = (paths: string[]): Paths => {
         return new Paths(

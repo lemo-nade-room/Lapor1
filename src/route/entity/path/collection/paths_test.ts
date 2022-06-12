@@ -2,6 +2,7 @@ import { assert, assertThrows } from "https://deno.land/std@0.65.0/testing/asser
 import { Paths } from "./paths.ts"
 import { UnitPath } from "../unit/unitPath.ts"
 import { FrameworkError } from "../../../../error/frameworkError.ts"
+import { InvalidPathPhraseError } from "../../../../error/invalidPathPhraseError.ts"
 
 Deno.test("等価", () => {
     const paths1 = Paths.make([])
@@ -60,4 +61,10 @@ Deno.test('baseのパスを指定', () => {
     const actual = paths.based(base)
     const expected = Paths.make(['base', 'path', 'hello', 'world'])
     assert(actual.equals(expected))
+})
+
+Deno.test('異常系: 最後以外にcatcall', () => {
+    Paths.make(['*', 'a'])
+    Paths.make(['b', '**'])
+    assertThrows(() => Paths.make(['**', 'a']), InvalidPathPhraseError)
 })
