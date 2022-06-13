@@ -58,6 +58,10 @@ export class Paths {
         return new Paths(base.paths.concat(this.paths))
     }
 
+    public get fullPath(): string {
+        return this.paths.map(path => path.value).join('/')
+    }
+
     private get count(): number {
         return this.paths.length
     }

@@ -49,9 +49,15 @@ export class Routing {
     }
 
     public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
-        if (!paths.isCurrent) return await this.routingCollection.handle(method, paths, req, this.nextRoutedPaths(routedPaths))
+        if (this.isNextRouting(paths)) return await this.routingCollection.handle(method, paths, req, this.nextRoutedPaths(routedPaths))
         req._routedPaths = this.nextRoutedPaths(routedPaths)
         return await this.handlers.handle(method, req)
+    }
+
+    private readonly isNextRouting = (paths: Paths): boolean => {
+        if (this.path.isCatcall) return false
+        if (paths.isCurrent) return false
+        return true
     }
 
     private readonly nextRoutedPaths = (paths: Paths): Paths => {

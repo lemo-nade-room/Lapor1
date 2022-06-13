@@ -84,3 +84,11 @@ Deno.test('経由', () => {
 
     assert(after.equals(Paths.make(['Hello'])))
 })
+
+Deno.test('full path', () => {
+    const paths = Paths.make(['hello', 'world'])
+    assertStrictEquals(
+        paths.fullPath,
+        'hello/world'
+    )
+})

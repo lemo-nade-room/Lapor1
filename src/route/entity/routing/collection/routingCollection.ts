@@ -15,14 +15,16 @@ export class RoutingCollection implements IRoutingCollection {
         private readonly routes: readonly Routing[] = []
     ) {}
 
-    public readonly setHttpHandler = (method: HTTPMethod, paths: Paths, middlewares: LMiddlewares, handler: HttpHandler): IRoutingCollection => {
-        if (this.has(paths.nextPath)) this.setHttp(method, paths, middlewares, handler)
-        return this.routeAdded(paths.nextPath).setHttp(method, paths, middlewares, handler)
+    public readonly setHttpHandler = (method: HTTPMethod, paths: Paths, middlewares: LMiddlewares, handler: HttpHandler): RoutingCollection => {
+        const nextPath = paths.isCurrent ? UnitPath.root : paths.nextPath
+        if (this.has(nextPath)) this.setHttp(method, paths, middlewares, handler)
+        return this.routeAdded(nextPath).setHttp(method, paths, middlewares, handler)
     }
 
     public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
-        const route = this.httpRouting(paths.nextPath)
-        if (route) return await route.handle(method, paths.nextPaths, req, routedPaths)
+        const guardedPaths = paths.isCurrent ? new Paths([UnitPath.root]) : paths
+        const route = this.httpRouting(guardedPaths.nextPath)
+        if (route) return await route.handle(method, guardedPaths.nextPaths, req, routedPaths)
         throw Abort.notFound
     }
 
@@ -52,10 +54,11 @@ export class RoutingCollection implements IRoutingCollection {
     }
 
     private readonly setHttp = (method: HTTPMethod, paths: Paths, middlewares: LMiddlewares, handler: HttpHandler): RoutingCollection => {
+        const guardedPaths = paths.isCurrent ? new Paths([UnitPath.root]) : paths
         return new RoutingCollection(
             this.routes.map(
-                routing => routing.isPath(paths.nextPath) ?
-                    routing.setHttpHandler(method, paths.nextPaths, middlewares, handler) : routing
+                routing => routing.isPath(guardedPaths.nextPath) ?
+                    routing.setHttpHandler(method, guardedPaths.nextPaths, middlewares, handler) : routing
             )
         )
     }
