@@ -1,6 +1,7 @@
 import { UnitPath } from "../unit/unitPath.ts"
 import { FrameworkError } from "../../../../error/frameworkError.ts"
 import { InvalidPathPhraseError } from "../../../../error/invalidPathPhraseError.ts"
+import { Params } from "../../../../request/entity/params/params.ts"
 
 export class Paths {
 
@@ -37,6 +38,20 @@ export class Paths {
     public get nextPaths(): Paths {
         if (this.isCurrent) throw new FrameworkError('次のパスが存在しないのにnextPathsが呼び出された')
         return new Paths(this.paths.slice(1))
+    }
+
+    public readonly parameters = (routedPaths: Paths): Params => {
+        return routedPaths.paths.reduce<Params> (
+            (params, path, i) => {
+                if (!path.isParam()) return params
+                return params.appended(path.paramName(), this.paths[i].value)
+            },
+            new Params()
+        )
+    }
+
+    public readonly goThrough = (path: UnitPath): Paths => {
+        return new Paths(this.paths.concat([path]))
     }
 
     public readonly based = (base: Paths): Paths => {

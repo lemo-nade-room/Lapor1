@@ -1,4 +1,4 @@
-import { assert, assertThrows } from "https://deno.land/std@0.65.0/testing/asserts.ts";
+import { assert, assertStrictEquals, assertThrows } from "https://deno.land/std@0.65.0/testing/asserts.ts";
 import { Paths } from "./paths.ts"
 import { UnitPath } from "../unit/unitPath.ts"
 import { FrameworkError } from "../../../../error/frameworkError.ts"
@@ -67,4 +67,20 @@ Deno.test('異常系: 最後以外にcatcall', () => {
     Paths.make(['*', 'a'])
     Paths.make(['b', '**'])
     assertThrows(() => Paths.make(['**', 'a']), InvalidPathPhraseError)
+})
+
+Deno.test('paramsの取り出し', () => {
+    const uriPaths = Paths.make(['hello', 'tanaka', 'good'])
+    const routedPaths = Paths.make(['hello', ':name', 'good'])
+
+    const params = uriPaths.parameters(routedPaths)
+
+    assertStrictEquals(params.get('name'), 'tanaka')
+})
+
+Deno.test('経由', () => {
+    const before = Paths.root
+    const after = before.goThrough(UnitPath.make('Hello'))
+
+    assert(after.equals(Paths.make(['Hello'])))
 })

@@ -3,6 +3,8 @@ import { LApplication } from "./src/application/lApplication.ts"
 import { serve as denoServe } from "https://deno.land/std@0.138.0/http/server.ts"
 import { UriConverter } from "./src/uri/convert/uriConverter.ts"
 import { HTTPMethod as LHTTPMethod } from "./src/method/httpMethod.ts"
+import { LRequest } from "./src/request/entity/lRequest.ts"
+import { HTTPHeaders } from "./src/header/httpHeaders.ts"
 
 const uriConverter = new UriConverter()
 
@@ -14,8 +16,8 @@ export const serve = async (configure: ((app: Application) => void)): Promise<vo
     await denoServe(async (req) => {
         const pathname = new URL(req.url).pathname
         const uri = uriConverter.convert(pathname)
-        const request = undefined as any
         const method = LHTTPMethod.read(req.method)
+        const request = new LRequest(app, new HTTPHeaders(), method, uri)
         const lRes = await app.handle(method, uri.paths, request)
         if (typeof lRes === 'string') return new Response(lRes)
         return new Response(JSON.stringify(lRes))

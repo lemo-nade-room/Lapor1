@@ -9,5 +9,5 @@ export interface IRoutingCollection {
 
     setHttpHandler(method: HTTPMethod, paths: Paths, middlewares: LMiddlewares, handler: HttpHandler): IRoutingCollection
 
-    handle(method: HTTPMethod, paths: Paths, req: Request): Promise<Response>
+    handle(method: HTTPMethod, paths: Paths, req: Request, routedPaths: Paths): Promise<Response>
 }

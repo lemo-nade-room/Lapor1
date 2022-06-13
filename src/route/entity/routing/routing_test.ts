@@ -8,6 +8,10 @@ import { IRoutingCollection } from "./collection/iRoutingCollection.ts"
 import { Paths } from "../path/collection/paths.ts"
 import { HttpHandler } from "../../../handler/http/httpHandler.ts"
 import { Request } from "../../../request/request.ts"
+import { LRequest } from "../../../request/entity/lRequest.ts"
+import { LApplication } from "../../../application/lApplication.ts"
+import { HTTPHeaders } from "../../../header/httpHeaders.ts"
+import { URI } from "../../../uri/uri.ts"
 
 let log = ""
 
@@ -39,11 +43,11 @@ Deno.test("setとhandle", async () => {
 
     assertStrictEquals(log, " path ")
 
-    const request: any = undefined
-    let response = await routing.handle(HTTPMethod.POST, Paths.make([]), request)
+    const request = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
+    let response = await routing.handle(HTTPMethod.POST, Paths.make([]), request, Paths.root)
     assertStrictEquals(response, "Add")
 
-    response = await routing.handle(HTTPMethod.POST, Paths.make(['how']), request)
+    response = await routing.handle(HTTPMethod.POST, Paths.make(['how']), request, Paths.root)
     assertStrictEquals(response, "Collection Handle")
 
 })
@@ -55,4 +59,18 @@ Deno.test('isAnythingの確認', () => {
 
     assert(anythingRouting.isAnything)
     assert(!normalRouting.isAnything)
+})
+
+Deno.test('経由', async () => {
+    const paths = Paths.make(['hello', 'world'])
+    const req = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
+
+    const routing = Routing.init({ path: UnitPath.make(':name') })
+        .setHttpHandler(HTTPMethod.GET, Paths.root, new LMiddlewares(),  async () => '')
+
+    await routing.handle(HTTPMethod.GET, Paths.root, req, paths)
+
+    assert(req._routedPaths?.equals(
+        Paths.make(['hello', 'world', ':name'])
+    ))
 })

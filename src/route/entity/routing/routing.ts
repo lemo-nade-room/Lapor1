@@ -6,9 +6,9 @@ import { HttpHandler } from "../../../handler/http/httpHandler.ts"
 import { HTTPMethod } from "../../../method/httpMethod.ts"
 import { Paths } from "../path/collection/paths.ts"
 import { LMiddlewares } from "../../../middleware/entity/middlewares/lMiddlewares.ts"
-import { Request } from "../../../request/request.ts"
 import { Response } from "../../../response/response.ts"
 import { RoutingCollection } from "./collection/routingCollection.ts"
+import { LRequest } from "../../../request/entity/lRequest.ts"
 
 export class Routing {
 
@@ -44,9 +44,14 @@ export class Routing {
         return this.setHttpHandlerNextRoutingCollection(method, paths, middlewares, handler)
     }
 
-    public readonly handle = async (method: HTTPMethod, paths: Paths, req: Request): Promise<Response> => {
-        if (!paths.isCurrent) return await this.routingCollection.handle(method, paths, req)
+    public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
+        if (!paths.isCurrent) return await this.routingCollection.handle(method, paths, req, this.nextRoutedPaths(routedPaths))
+        req._routedPaths = this.nextRoutedPaths(routedPaths)
         return await this.handlers.handle(method, req)
+    }
+
+    private readonly nextRoutedPaths = (paths: Paths): Paths => {
+        return this.path.isRoot ? paths : paths.goThrough(this.path)
     }
 
     private readonly setCurrentHttpHandler = (method: HTTPMethod, middlewares: LMiddlewares, handler: HttpHandler): Routing => {

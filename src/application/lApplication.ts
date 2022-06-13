@@ -8,9 +8,9 @@ import { WebSocketOnUpgrade } from "../handler/webSocketOnUpgrade.ts"
 import { HTTPMethod } from "../method/httpMethod.ts"
 import { HttpHandler } from "../handler/http/httpHandler.ts"
 import { Paths } from "../route/entity/path/collection/paths.ts"
-import { Request } from "../request/request.ts"
 import { Response } from "../response/response.ts"
 import { SessionMiddleware } from "../session/middleware/sessionMiddleware.ts"
+import { LRequest } from "../request/entity/lRequest.ts"
 
 export class LApplication implements Application {
 
@@ -55,7 +55,7 @@ export class LApplication implements Application {
         this.routesBuilder.register(collection)
     }
 
-    public readonly handle = async (method: HTTPMethod, paths: Paths, req: Request): Promise<Response> => {
+    public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest): Promise<Response> => {
         return await this.routesBuilder.handle(method, paths, req)
     }
 

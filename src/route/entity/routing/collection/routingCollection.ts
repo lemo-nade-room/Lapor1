@@ -5,9 +5,9 @@ import { LMiddlewares } from "../../../../middleware/entity/middlewares/lMiddlew
 import { HttpHandler } from "../../../../handler/http/httpHandler.ts"
 import { Routing } from "../routing.ts"
 import { UnitPath } from "../../path/unit/unitPath.ts"
-import { Request } from "../../../../request/request.ts"
 import { Response } from "../../../../response/response.ts"
 import { Abort } from "../../../../error/abort.ts"
+import { LRequest } from "../../../../request/entity/lRequest.ts"
 
 export class RoutingCollection implements IRoutingCollection {
 
@@ -20,9 +20,9 @@ export class RoutingCollection implements IRoutingCollection {
         return this.routeAdded(paths.nextPath).setHttp(method, paths, middlewares, handler)
     }
 
-    public readonly handle = async (method: HTTPMethod, paths: Paths, req: Request): Promise<Response> => {
+    public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
         const route = this.httpRouting(paths.nextPath)
-        if (route) return await route.handle(method, paths.nextPaths, req)
+        if (route) return await route.handle(method, paths.nextPaths, req, routedPaths)
         throw Abort.notFound
     }
 

@@ -8,6 +8,10 @@ import { HTTPMethod } from "../../method/httpMethod.ts"
 import { Paths } from "./path/collection/paths.ts"
 import { RouteCollection } from "../routeCollection.ts"
 import { RoutesBuilder } from "../routesBuilder.ts"
+import { LRequest } from "../../request/entity/lRequest.ts"
+import { LApplication } from "../../application/lApplication.ts"
+import { HTTPHeaders } from "../../header/httpHeaders.ts"
+import { URI } from "../../uri/uri.ts"
 
 class MyMiddleware implements Middleware {
     constructor(
@@ -33,7 +37,7 @@ class LoginController implements RouteCollection {
 Deno.test('一連のテスト', async () => {
 
     const routesBuilder = LRoutesBuilder.init()
-    const req: any = undefined
+    const req = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
 
     const login = routesBuilder.grouped('login')
     login.register(new LoginController())
@@ -72,7 +76,7 @@ Deno.test('anythingのルーティング', async () => {
     lRoutesBuilder.get(['one', 'two'], async () => 'one two')
     lRoutesBuilder.get(['one', 'two', 'three'], async () => 'one two three')
 
-    const req = undefined as any
+    const req = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
 
     assertStrictEquals(
         await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make([]), req),
@@ -102,5 +106,25 @@ Deno.test('anythingのルーティング', async () => {
     assertStrictEquals(
         await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'xxx', 'three']), req),
         'anything three'
+    )
+})
+
+Deno.test('paramsのルーティング', async () => {
+    const lRoutesBuilder = LRoutesBuilder.init()
+
+    lRoutesBuilder.get(['hello', ':name', 'world'], async (req) => {
+        return req.parameters.get('name')
+    })
+
+    const paths = Paths.make(['hello', 'John', 'world'])
+
+    const req = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(paths))
+
+
+    const res = await lRoutesBuilder.handle(HTTPMethod.GET, paths, req)
+
+    assertStrictEquals(
+        res,
+        'John'
     )
 })

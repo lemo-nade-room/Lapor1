@@ -7,8 +7,8 @@ import { RouteCollection } from "../routeCollection.ts"
 import { LRouting } from "./lRouting.ts"
 import { LMiddlewares } from "../../middleware/entity/middlewares/lMiddlewares.ts"
 import { WebSocketOnUpgrade } from "../../handler/webSocketOnUpgrade.ts"
-import { Request } from "../../request/request.ts"
 import { Response } from "../../response/response.ts"
+import { LRequest } from "../../request/entity/lRequest.ts"
 
 export type GroupedOverload = {
     (use: Middleware): RoutesBuilder
@@ -58,7 +58,7 @@ export class LRoutesBuilder implements RoutesBuilder {
 
     public readonly webSocket = (paths: string[], onUpgrade: WebSocketOnUpgrade): void => {}
 
-    public readonly handle = async (method: HTTPMethod, paths: Paths, req: Request): Promise<Response> => {
+    public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest): Promise<Response> => {
         return await this.routing.handle(method, paths, req)
     }
 
