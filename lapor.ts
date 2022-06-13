@@ -5,6 +5,7 @@ import { UriConverter } from "./src/uri/convert/uriConverter.ts"
 import { HTTPMethod as LHTTPMethod } from "./src/method/httpMethod.ts"
 import { LRequest } from "./src/request/entity/lRequest.ts"
 import { HTTPHeaders } from "./src/header/httpHeaders.ts"
+import { HttpStatus } from "./src/status/httpStatus.ts"
 
 const uriConverter = new UriConverter()
 
@@ -14,13 +15,23 @@ export const serve = async (configure: ((app: Application) => void)): Promise<vo
     configure(app)
 
     await denoServe(async (req) => {
-        const pathname = new URL(req.url).pathname
-        const uri = uriConverter.convert(pathname)
-        const method = LHTTPMethod.read(req.method)
-        const request = new LRequest(app, new HTTPHeaders(), method, uri)
-        const lRes = await app.handle(method, uri.paths, request)
-        if (typeof lRes === 'string') return new Response(lRes)
-        return new Response(JSON.stringify(lRes))
+        try {
+            const pathname = new URL(req.url).pathname
+            const uri = uriConverter.convert(pathname)
+            const method = LHTTPMethod.read(req.method)
+            const request = new LRequest(app, new HTTPHeaders(), method, uri)
+            const lRes = await app.handle(method, uri.paths, request)
+            if (typeof lRes === 'string') return new Response(lRes)
+            if (lRes instanceof HttpStatus) return lRes.response
+            return new Response(JSON.stringify(lRes))
+        } catch (e) {
+            // e instanceof Abortだとなぜか効かない
+            if (e.type === 'abort') {
+                return e.response
+            }
+            console.log(e)
+            return HttpStatus.badRequest.response
+        }
     })
 }
 
