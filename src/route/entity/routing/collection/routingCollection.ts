@@ -23,13 +23,23 @@ export class RoutingCollection implements IRoutingCollection {
 
     public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
         const guardedPaths = paths.isCurrent ? new Paths([UnitPath.root]) : paths
-        const route = this.httpRouting(guardedPaths.nextPath)
-        if (route) return await route.handle(method, guardedPaths.nextPaths, req, routedPaths)
-        throw Abort.notFound
+        return await this.httpHandle(method, guardedPaths, req, routedPaths)
     }
 
-    private readonly httpRouting = (path: UnitPath): Routing | undefined => {
-        return this.matchRoute(path) ?? this.anythingRoute() ?? this.catcallRoute()
+    private readonly httpHandle = async (method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
+        const tryRoutes: (Routing | undefined)[] = [this.matchRoute(paths.nextPath), this.anythingRoute(), this.catcallRoute()]
+        for (const route of tryRoutes) {
+            try {
+                if (route === undefined) continue
+                return await route.handle(method, paths.nextPaths, req, routedPaths)
+            } catch (e) {
+                console.dir(e)
+                if (e.type === 'abort' && e.statusCode === 404) continue
+                console.log(route)
+                throw e
+            }
+        }
+        throw Abort.notFound
     }
 
     private readonly has = (path: UnitPath): boolean => {

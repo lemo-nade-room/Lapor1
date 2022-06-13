@@ -5,7 +5,7 @@ export class Abort extends Error {
     private readonly type: string = 'abort'
 
     private constructor(
-        private readonly httpStatus: HttpStatus,
+        public readonly httpStatus: HttpStatus,
     ) {
         super()
     }
@@ -17,5 +17,9 @@ export class Abort extends Error {
 
     public get response(): Response {
         return this.httpStatus.response
+    }
+
+    public get statusCode(): number {
+        return this.httpStatus.statusCode
     }
 }

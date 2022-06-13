@@ -1,7 +1,7 @@
 export class HttpStatus {
 
     private constructor(
-        private readonly statusCode: number,
+        public readonly statusCode: number,
         private readonly statusText: string,
     ) {}
 

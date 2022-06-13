@@ -70,43 +70,43 @@ Deno.test('一連のテスト', async () => {
 Deno.test('anythingのルーティング', async () => {
     const lRoutesBuilder = LRoutesBuilder.init()
     lRoutesBuilder.get(async () => 'Root')
-    // lRoutesBuilder.get('one', async () => 'one')
-    // lRoutesBuilder.get(['one', '*'], async () => 'anything')
-    // lRoutesBuilder.get(['one', '*', 'three'], async () => 'anything three')
-    // lRoutesBuilder.get(['one', 'two'], async () => 'one two')
-    // lRoutesBuilder.get(['one', 'two', 'three'], async () => 'one two three')
-    //
-    // const req = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
-    //
-    // assertStrictEquals(
-    //     await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make([]), req),
-    //     'Root'
-    // )
-    //
-    // assertStrictEquals(
-    //     await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one']), req),
-    //     'one'
-    // )
-    //
-    // assertStrictEquals(
-    //     await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'xxx']), req),
-    //     'anything'
-    // )
-    //
-    // assertStrictEquals(
-    //     await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'two']), req),
-    //     'one two'
-    // )
-    //
-    // assertStrictEquals(
-    //     await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'two', 'three']), req),
-    //     'one two three'
-    // )
-    //
-    // assertStrictEquals(
-    //     await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'xxx', 'three']), req),
-    //     'anything three'
-    // )
+    lRoutesBuilder.get('one', async () => 'one')
+    lRoutesBuilder.get(['one', '*'], async () => 'anything')
+    lRoutesBuilder.get(['one', '*', 'three'], async () => 'anything three')
+    lRoutesBuilder.get(['one', 'two'], async () => 'one two')
+    lRoutesBuilder.get(['one', 'two', 'three'], async () => 'one two three')
+
+    const req = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make([]), req),
+        'Root'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one']), req),
+        'one'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'xxx']), req),
+        'anything'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'two']), req),
+        'one two'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'two', 'three']), req),
+        'one two three'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['one', 'xxx', 'three']), req),
+        'anything three'
+    )
 })
 
 Deno.test('paramsのルーティング', async () => {
@@ -162,4 +162,25 @@ Deno.test('catcallのルーティング', async () => {
         'hello'
     )
 
+})
+
+
+Deno.test('メソッドの違うワイルドカード', async () => {
+    const lRoutesBuilder = LRoutesBuilder.init()
+    lRoutesBuilder.get(['hello'], async () => 'World!!')
+    lRoutesBuilder.post(['**'], async () => 'all!')
+
+    const getRequest = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['hello']), getRequest),
+        'World!!'
+    )
+
+    const postRequest = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.POST, new URI(Paths.root))
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.POST, Paths.make(['hello']), postRequest),
+        'all!'
+    )
 })
