@@ -11,12 +11,15 @@ import { Paths } from "../route/entity/path/collection/paths.ts"
 import { Response } from "../response/response.ts"
 import { SessionMiddleware } from "../session/middleware/sessionMiddleware.ts"
 import { LRequest } from "../request/entity/lRequest.ts"
+import { Directory } from "../directory/directory.ts"
+import { LDirectory } from "../directory/lDirectory.ts"
 
 export class LApplication implements Application {
 
     public constructor(
         private readonly routesBuilder: LRoutesBuilder = LRoutesBuilder.init(),
-        private readonly middlewares: LMiddlewares = new LMiddlewares()
+        private readonly middlewares: LMiddlewares = new LMiddlewares(),
+        public readonly directory: Directory = new LDirectory()
     ) {}
 
     public readonly get: HttpHandleOverload = (pathOrPathsOrHandler: string | string[] | HttpHandler, handler?: HttpHandler) => {
@@ -71,5 +74,4 @@ export class LApplication implements Application {
     public readonly webSocket = (paths: string[], onUpgrade: WebSocketOnUpgrade): void => {
         return this.routesBuilder.webSocket(paths, onUpgrade)
     }
-
 }

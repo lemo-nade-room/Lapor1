@@ -4,6 +4,7 @@ import { RouteCollection } from "../route/routeCollection.ts"
 import { WebSocketOnUpgrade } from "../handler/webSocketOnUpgrade.ts"
 import { Sessions } from "../session/sessions.ts"
 import { GroupedOverload, GroupOverload } from "../route/entity/lRoutesBuilder.ts"
+import { Directory } from "../directory/directory.ts"
 
 export interface Application {
 
@@ -40,5 +41,7 @@ export interface Application {
     register(collection: RouteCollection): void
 
     get sessions(): Sessions
+
+    directory: Directory
 
 }
