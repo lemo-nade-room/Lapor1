@@ -52,13 +52,23 @@ Deno.test("setとhandle", async () => {
 
 })
 
-Deno.test('isAnythingの確認', () => {
+Deno.test('isAnythingのテスト', () => {
     const anythingRouting = Routing.init({ path: UnitPath.make('*') })
 
     const normalRouting = Routing.init({ path: UnitPath.make('hello') })
 
     assert(anythingRouting.isAnything)
     assert(!normalRouting.isAnything)
+})
+
+Deno.test('isCatcallのテスト', () => {
+    const catcallRouting = Routing.init({ path: UnitPath.make('**') })
+    const anythingRouting = Routing.init({ path: UnitPath.make('*') })
+    const normalRouting = Routing.init({ path: UnitPath.make('hello') })
+
+    assert(catcallRouting.isCatcall)
+    assert(!anythingRouting.isCatcall)
+    assert(!normalRouting.isCatcall)
 })
 
 Deno.test('経由', async () => {

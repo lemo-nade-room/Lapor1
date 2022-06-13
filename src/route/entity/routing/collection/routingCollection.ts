@@ -27,7 +27,7 @@ export class RoutingCollection implements IRoutingCollection {
     }
 
     private readonly httpRouting = (path: UnitPath): Routing | undefined => {
-        return this.matchRoute(path) ?? this.anythingRoute()
+        return this.matchRoute(path) ?? this.anythingRoute() ?? this.catcallRoute()
     }
 
     private readonly has = (path: UnitPath): boolean => {
@@ -40,6 +40,10 @@ export class RoutingCollection implements IRoutingCollection {
 
     private readonly anythingRoute = (): Routing | undefined => {
         return this.routes.find(route => route.isAnything)
+    }
+
+    private readonly catcallRoute = (): Routing | undefined => {
+        return this.routes.find(route => route.isCatcall)
     }
 
     private readonly routeAdded = (path: UnitPath): RoutingCollection => {

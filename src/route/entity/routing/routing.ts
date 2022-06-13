@@ -39,6 +39,10 @@ export class Routing {
         return this.path.isAnything
     }
 
+    public get isCatcall(): boolean {
+        return this.path.isCatcall
+    }
+
     public readonly setHttpHandler = (method: HTTPMethod, paths: Paths, middlewares: LMiddlewares, handler: HttpHandler): Routing => {
         if (paths.isCurrent) return this.setCurrentHttpHandler(method, middlewares, handler)
         return this.setHttpHandlerNextRoutingCollection(method, paths, middlewares, handler)

@@ -128,3 +128,22 @@ Deno.test('paramsのルーティング', async () => {
         'John'
     )
 })
+
+Deno.test('catcallのルーティング', async () => {
+    const lRoutesBuilder = LRoutesBuilder.init()
+    lRoutesBuilder.get(['hello', 'world'], async () => 'World!!')
+    lRoutesBuilder.get(['hello', '**'], async () => 'all!')
+
+    const req = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['hello', 'world']), req),
+        'World!!'
+    )
+
+    assertStrictEquals(
+        await lRoutesBuilder.handle(HTTPMethod.GET, Paths.make(['hello', 'morning']), req),
+        'all!'
+    )
+
+})
