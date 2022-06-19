@@ -10,6 +10,7 @@ import { Response as LResponse } from "./src/response/response.ts"
 import { Responsible } from "./src/response/responsible.ts"
 import { LCookie } from "./src/cookie/lCookie.ts"
 import { SessionStorage } from "./src/session/storage/sessionStorage.ts"
+import { Protocol } from "./src/protocol/protocol.ts"
 
 const uriConverter = new UriConverter()
 
@@ -38,11 +39,13 @@ export const serve = async (configure: ((app: Application) => void)): Promise<vo
 
             const sessions = storage.get(cookie.sessionId)
 
-            const pathname = new URL(req.url).pathname
+            const url = new URL(req.url)
+            const pathname = url.pathname
+            const protocol = new Protocol(url.protocol)
             const uri = uriConverter.convert(pathname)
             const method = LHTTPMethod.read(req.method)
             const request = new LRequest(app, new HTTPHeaders(), method, uri, sessions, app.directory)
-            const lRes = await app.handle(method, uri.paths, request)
+            const lRes = await app.handle(protocol, method, uri.paths, request)
 
             const response = convertResponse(lRes)
             response.headers.set("Set-Cookie", `session_id=${sessions.uuid}; `)
