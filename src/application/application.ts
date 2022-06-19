@@ -2,7 +2,6 @@ import { HttpHandler } from "../handler/http/httpHandler.ts"
 import { Middlewares } from "../middleware/middlewares.ts"
 import { RouteCollection } from "../route/routeCollection.ts"
 import { WebSocketOnUpgrade } from "../handler/webSocketOnUpgrade.ts"
-import { Sessions } from "../session/sessions.ts"
 import { GroupedOverload, GroupOverload } from "../route/entity/lRoutesBuilder.ts"
 import { Directory } from "../directory/directory.ts"
 
@@ -39,8 +38,6 @@ export interface Application {
     get middleware(): Middlewares
 
     register(collection: RouteCollection): void
-
-    get sessions(): Sessions
 
     directory: Directory
 

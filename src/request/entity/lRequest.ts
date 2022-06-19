@@ -9,6 +9,8 @@ import { FrameworkError } from "../../error/frameworkError.ts"
 import { Params } from "./params/params.ts"
 import { Directory } from "../../directory/directory.ts"
 import { LDirectory } from "../../directory/lDirectory.ts"
+import { Sessions } from "../../session/sessions.ts"
+import { LSessions } from "../../session/entity/lSessions.ts"
 
 export class LRequest implements Request {
 
@@ -17,6 +19,7 @@ export class LRequest implements Request {
         public readonly headers: HTTPHeaders,
         public readonly method: HTTPMethod,
         public readonly url: URI,
+        public readonly sessions: Sessions = new LSessions('', {}),
         public readonly directory: Directory = new LDirectory(),
         public _routedPaths?: Paths
     ) {}

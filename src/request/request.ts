@@ -4,6 +4,7 @@ import { URI } from "../uri/uri.ts";
 import { HTTPHeaders } from "../header/httpHeaders.ts";
 import { Route } from "../route/route.ts";
 import { Params } from "./entity/params/params.ts"
+import { Sessions } from "../session/sessions.ts"
 
 export interface Request {
     application: Application
@@ -15,4 +16,5 @@ export interface Request {
     get content(): string | Record<string | number, unknown>
     get query(): Record<string, string>
     get parameters(): Params
+    get sessions(): Sessions
 }

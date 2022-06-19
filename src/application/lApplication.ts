@@ -3,13 +3,11 @@ import { GroupedOverload, GroupOverload, HttpHandleOverload, LRoutesBuilder } fr
 import { Middlewares } from "../middleware/middlewares.ts"
 import { LMiddlewares } from "../middleware/entity/middlewares/lMiddlewares.ts"
 import { RouteCollection } from "../route/routeCollection.ts"
-import { Sessions } from "../session/sessions.ts"
 import { WebSocketOnUpgrade } from "../handler/webSocketOnUpgrade.ts"
 import { HTTPMethod } from "../method/httpMethod.ts"
 import { HttpHandler } from "../handler/http/httpHandler.ts"
 import { Paths } from "../route/entity/path/collection/paths.ts"
 import { Response } from "../response/response.ts"
-import { SessionMiddleware } from "../session/middleware/sessionMiddleware.ts"
 import { LRequest } from "../request/entity/lRequest.ts"
 import { Directory } from "../directory/directory.ts"
 import { LDirectory } from "../directory/lDirectory.ts"
@@ -19,7 +17,7 @@ export class LApplication implements Application {
     public constructor(
         private readonly routesBuilder: LRoutesBuilder = LRoutesBuilder.init(),
         private readonly middlewares: LMiddlewares = new LMiddlewares(),
-        public readonly directory: Directory = new LDirectory()
+        public readonly directory: Directory = new LDirectory(),
     ) {}
 
     public readonly get: HttpHandleOverload = (pathOrPathsOrHandler: string | string[] | HttpHandler, handler?: HttpHandler) => {
@@ -60,15 +58,6 @@ export class LApplication implements Application {
 
     public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest): Promise<Response> => {
         return await this.routesBuilder.handle(method, paths, req)
-    }
-
-    // 未実装
-    public get sessions(): Sessions {
-        return new class implements Sessions {
-            get middleware(): SessionMiddleware {
-                return new SessionMiddleware;
-            }
-        }()
     }
 
     public readonly webSocket = (paths: string[], onUpgrade: WebSocketOnUpgrade): void => {

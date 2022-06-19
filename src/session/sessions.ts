@@ -1,5 +1,3 @@
-import { SessionMiddleware } from "./middleware/sessionMiddleware.ts"
-
 export interface Sessions {
-    get middleware(): SessionMiddleware
+    get data(): Record<string, string>
 }

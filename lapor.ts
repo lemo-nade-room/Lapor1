@@ -8,6 +8,8 @@ import { HTTPHeaders } from "./src/header/httpHeaders.ts"
 import { HttpStatus } from "./src/status/httpStatus.ts"
 import { Response as LResponse } from "./src/response/response.ts"
 import { Responsible } from "./src/response/responsible.ts"
+import { LCookie } from "./src/cookie/lCookie.ts"
+import { SessionStorage } from "./src/session/storage/sessionStorage.ts"
 
 const uriConverter = new UriConverter()
 
@@ -16,22 +18,35 @@ const isResponsible = (response: LResponse): boolean => {
     return res.type === 'response'
 }
 
+const convertResponse = (lRes: LResponse): Response => {
+    if (typeof lRes === 'string') return new Response(lRes)
+    if (isResponsible(lRes)) return (lRes as Responsible).response()
+    if (lRes instanceof HttpStatus) return lRes.response
+    return new Response(JSON.stringify(lRes))
+}
+
 export const serve = async (configure: ((app: Application) => void)): Promise<void> => {
 
     const app = new LApplication()
     configure(app)
 
+    const storage = new SessionStorage()
+
     await denoServe(async (req) => {
         try {
+            const cookie = new LCookie(req.headers.get('Cookie') ?? '')
+
+            const sessions = storage.get(cookie.sessionId)
+
             const pathname = new URL(req.url).pathname
             const uri = uriConverter.convert(pathname)
             const method = LHTTPMethod.read(req.method)
-            const request = new LRequest(app, new HTTPHeaders(), method, uri, app.directory)
+            const request = new LRequest(app, new HTTPHeaders(), method, uri, sessions, app.directory)
             const lRes = await app.handle(method, uri.paths, request)
-            if (typeof lRes === 'string') return new Response(lRes)
-            if (isResponsible(lRes)) return (lRes as Responsible).response()
-            if (lRes instanceof HttpStatus) return lRes.response
-            return new Response(JSON.stringify(lRes))
+
+            const response = convertResponse(lRes)
+            response.headers.set("Set-Cookie", `session_id=${sessions.uuid}; `)
+            return response
         } catch (e) {
             // e instanceof Abortだとなぜか効かない
             if (e.type === 'abort') {

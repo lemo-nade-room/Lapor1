@@ -2,7 +2,7 @@ import { Responsible } from '../responsible.ts'
 
 export class FileResponse implements Responsible {
 
-    public readonly type = 'response'
+    public readonly type = 'responsible'
 
     public constructor(
         private readonly file: string | Blob,
