@@ -1,7 +1,7 @@
 import { HttpHandler } from "../handler/http/httpHandler.ts"
 import { Middlewares } from "../middleware/middlewares.ts"
 import { RouteCollection } from "../route/routeCollection.ts"
-import { WebSocketOnUpgrade } from "../handler/webSocketOnUpgrade.ts"
+import { WebSocketOnUpgrade } from "../handler/socket/webSocketOnUpgrade.ts"
 import { GroupedOverload, GroupOverload } from "../route/entity/lRoutesBuilder.ts"
 import { Directory } from "../directory/directory.ts"
 
@@ -30,6 +30,8 @@ export interface Application {
     register(collection: RouteCollection): void
 
     webSocket(paths: string[], onUpgrade: WebSocketOnUpgrade): void
+    webSocket(path: string, onUpgrade: WebSocketOnUpgrade): void
+    webSocket(onUpgrade: WebSocketOnUpgrade): void
 
     grouped: GroupedOverload
 

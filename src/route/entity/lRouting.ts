@@ -5,6 +5,8 @@ import { RoutingCollection } from "./routing/collection/routingCollection.ts"
 import { LMiddlewares } from "../../middleware/entity/middlewares/lMiddlewares.ts"
 import { Response } from "../../response/response.ts"
 import { LRequest } from "../../request/entity/lRequest.ts"
+import { WebSocketOnUpgrade } from "../../handler/socket/webSocketOnUpgrade.ts"
+import { Protocol } from "../../protocol/protocol.ts"
 
 export class LRouting {
 
@@ -20,7 +22,11 @@ export class LRouting {
         this.routingCollection = this.routingCollection.setHttpHandler(method, paths, middlewares, handler)
     }
 
-    public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest): Promise<Response> => {
-        return await this.routingCollection.handle(method, paths, req, Paths.root)
+    public readonly setWebSocketHandler = (paths: Paths, middlewares: LMiddlewares, onUpgrade: WebSocketOnUpgrade): void => {
+        this.routingCollection = this.routingCollection.setWebSocketHandler(paths, middlewares, onUpgrade)
+    }
+
+    public readonly handle = async (protocol: Protocol, method: HTTPMethod, paths: Paths, req: LRequest): Promise<Response> => {
+        return await this.routingCollection.handle(protocol, method, paths, req, Paths.root)
     }
 }

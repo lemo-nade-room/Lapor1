@@ -20,7 +20,7 @@ export class LMiddlewares implements Middlewares {
         return new LMiddlewares(this.middlewares.concat([middleware]))
     }
 
-    public get httpHandle(): Responder {
+    public get handle(): Responder {
         return this.middlewares
             .slice()
             .reverse()

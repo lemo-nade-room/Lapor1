@@ -47,7 +47,7 @@ Deno.test("Middleware Handle Test", async () => {
     middlewares.use(new B())
     middlewares.use(new C())
 
-    await middlewares.httpHandle(request, handler)
+    await middlewares.handle(request, handler)
 
     assertEquals(result, "abc|CBA")
 })
@@ -59,7 +59,7 @@ Deno.test("usedのテスト", async () => {
         .used(new B())
         .used(new C())
 
-    await middlewares.httpHandle(request, handler)
+    await middlewares.handle(request, handler)
 
     assertEquals(result, "abc|CBA")
 })

@@ -10,6 +10,6 @@ export class HttpMethodHandler {
     ) {}
 
     public readonly handle = (req: Request): Promise<Response> => {
-        return this.middlewares.httpHandle(req, this.handler)
+        return this.middlewares.handle(req, this.handler)
     }
 }

@@ -9,6 +9,7 @@ import { LRequest } from "../../../../request/entity/lRequest.ts"
 import { LApplication } from "../../../../application/lApplication.ts"
 import { HTTPHeaders } from "../../../../header/httpHeaders.ts"
 import { URI } from "../../../../uri/uri.ts"
+import { Protocol } from "../../../../protocol/protocol.ts"
 
 Deno.test('RoutingCollection Test', async () => {
     const collection = new RoutingCollection([
@@ -27,18 +28,18 @@ Deno.test('RoutingCollection Test', async () => {
         .setHttpHandler(HTTPMethod.POST, Paths.make(['good', 'bad', 'middle']), new LMiddlewares(), async () => 'God')
 
     const req = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
-    let res = await collection.handle(HTTPMethod.GET, Paths.make(['hello']), req, Paths.make([]))
+    let res = await collection.handle(new Protocol('http:'), HTTPMethod.GET, Paths.make(['hello']), req, Paths.make([]))
     assertStrictEquals(res, 'hello response')
 
-    res = await collection.handle(HTTPMethod.PATCH, Paths.make(['morning']), req, Paths.make([]))
+    res = await collection.handle(new Protocol('http:'), HTTPMethod.PATCH, Paths.make(['morning']), req, Paths.make([]))
     assertStrictEquals(res, 'morning response')
 
-    res = await collection.handle(HTTPMethod.DELETE, Paths.make(['afternoon']), req, Paths.make([]))
+    res = await collection.handle(new Protocol('http:'), HTTPMethod.DELETE, Paths.make(['afternoon']), req, Paths.make([]))
     assertStrictEquals(res, 'afternoon')
 
-    res = await collection.handle(HTTPMethod.PUT, Paths.make(['morning', 'night']), req, Paths.make([]))
+    res = await collection.handle(new Protocol('http:'), HTTPMethod.PUT, Paths.make(['morning', 'night']), req, Paths.make([]))
     assertStrictEquals(res, 'morning Night')
 
-    res = await collection.handle(HTTPMethod.POST, Paths.make(['good', 'bad', 'middle']), req, Paths.make([]))
+    res = await collection.handle(new Protocol('http:'), HTTPMethod.POST, Paths.make(['good', 'bad', 'middle']), req, Paths.make([]))
     assertStrictEquals(res, 'God')
 })

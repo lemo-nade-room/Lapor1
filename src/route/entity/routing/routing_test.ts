@@ -12,17 +12,24 @@ import { LRequest } from "../../../request/entity/lRequest.ts"
 import { LApplication } from "../../../application/lApplication.ts"
 import { HTTPHeaders } from "../../../header/httpHeaders.ts"
 import { URI } from "../../../uri/uri.ts"
+import { WebSocketOnUpgrade } from "../../../handler/socket/webSocketOnUpgrade.ts"
+import { Protocol } from "../../../protocol/protocol.ts"
 
 let log = ""
 
 class MockRouteCollection implements IRoutingCollection {
 
-    setHttpHandler(method: HTTPMethod, paths: Paths, middlewares: LMiddlewares, handler: HttpHandler): IRoutingCollection {
+    setHttpHandler(_method: HTTPMethod, _paths: Paths, _middlewares: LMiddlewares, _handler: HttpHandler): IRoutingCollection {
         log += ` path `
         return this
     }
 
-    handle = async (method: HTTPMethod, paths: Paths, req: Request) => "Collection Handle"
+    handle = async (_protocol: Protocol, _method: HTTPMethod, _paths: Paths, _req: Request) => "Collection Handle"
+
+    setWebSocketHandler(_paths: Paths, _middlewares: LMiddlewares, _onUpgrade: WebSocketOnUpgrade): IRoutingCollection {
+        log += ` ws `
+        return this
+    }
 }
 
 Deno.test("setとhandle", async () => {
@@ -44,10 +51,10 @@ Deno.test("setとhandle", async () => {
     assertStrictEquals(log, " path ")
 
     const request = new LRequest(new LApplication(), new HTTPHeaders(), HTTPMethod.GET, new URI(Paths.root))
-    let response = await routing.handle(HTTPMethod.POST, Paths.make([]), request, Paths.root)
+    let response = await routing.handle(new Protocol('http:'), HTTPMethod.POST, Paths.make([]), request, Paths.root)
     assertStrictEquals(response, "Add")
 
-    response = await routing.handle(HTTPMethod.POST, Paths.make(['how']), request, Paths.root)
+    response = await routing.handle(new Protocol('http:'), HTTPMethod.POST, Paths.make(['how']), request, Paths.root)
     assertStrictEquals(response, "Collection Handle")
 
 })
@@ -78,7 +85,7 @@ Deno.test('経由', async () => {
     const routing = Routing.init({ path: UnitPath.make(':name') })
         .setHttpHandler(HTTPMethod.GET, Paths.root, new LMiddlewares(),  async () => '')
 
-    await routing.handle(HTTPMethod.GET, Paths.root, req, paths)
+    await routing.handle(new Protocol('http:'), HTTPMethod.GET, Paths.root, req, paths)
 
     assert(req._routedPaths?.equals(
         Paths.make(['hello', 'world', ':name'])

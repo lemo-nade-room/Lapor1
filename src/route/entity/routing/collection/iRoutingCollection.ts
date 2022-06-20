@@ -4,10 +4,14 @@ import { LMiddlewares } from "../../../../middleware/entity/middlewares/lMiddlew
 import { HttpHandler } from "../../../../handler/http/httpHandler.ts"
 import { Request } from "../../../../request/request.ts"
 import { Response } from "../../../../response/response.ts"
+import { WebSocketOnUpgrade } from "../../../../handler/socket/webSocketOnUpgrade.ts"
+import { Protocol } from "../../../../protocol/protocol.ts"
 
 export interface IRoutingCollection {
 
     setHttpHandler(method: HTTPMethod, paths: Paths, middlewares: LMiddlewares, handler: HttpHandler): IRoutingCollection
 
-    handle(method: HTTPMethod, paths: Paths, req: Request, routedPaths: Paths): Promise<Response>
+    setWebSocketHandler(paths: Paths, middlewares: LMiddlewares, onUpgrade: WebSocketOnUpgrade): IRoutingCollection
+
+    handle(protocol: Protocol, method: HTTPMethod, paths: Paths, req: Request, routedPaths: Paths): Promise<Response>
 }

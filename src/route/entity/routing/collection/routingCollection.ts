@@ -8,6 +8,8 @@ import { UnitPath } from "../../path/unit/unitPath.ts"
 import { Response } from "../../../../response/response.ts"
 import { Abort } from "../../../../error/abort.ts"
 import { LRequest } from "../../../../request/entity/lRequest.ts"
+import { WebSocketOnUpgrade } from "../../../../handler/socket/webSocketOnUpgrade.ts"
+import { Protocol } from "../../../../protocol/protocol.ts"
 
 export class RoutingCollection implements IRoutingCollection {
 
@@ -21,21 +23,25 @@ export class RoutingCollection implements IRoutingCollection {
         return this.routeAdded(nextPath).setHttp(method, paths, middlewares, handler)
     }
 
-    public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
-        const guardedPaths = paths.isCurrent ? new Paths([UnitPath.root]) : paths
-        return await this.httpHandle(method, guardedPaths, req, routedPaths)
+    public readonly setWebSocketHandler = (paths: Paths, middlewares: LMiddlewares, onUpgrade: WebSocketOnUpgrade): RoutingCollection => {
+        const nextPath = paths.isCurrent ? UnitPath.root : paths.nextPath
+        if (this.has(nextPath)) this.setWebSocket(paths, middlewares, onUpgrade)
+        return this.routeAdded(nextPath).setWebSocket(paths, middlewares, onUpgrade)
     }
 
-    private readonly httpHandle = async (method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
+    public readonly handle = async (protocol: Protocol, method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
+        const guardedPaths = paths.isCurrent ? new Paths([UnitPath.root]) : paths
+        return await this.httpHandle(protocol, method, guardedPaths, req, routedPaths)
+    }
+
+    private readonly httpHandle = async (protocol: Protocol, method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
         const tryRoutes: (Routing | undefined)[] = [this.matchRoute(paths.nextPath), this.anythingRoute(), this.catcallRoute()]
         for (const route of tryRoutes) {
             try {
                 if (route === undefined) continue
-                return await route.handle(method, paths.nextPaths, req, routedPaths)
+                return await route.handle(protocol, method, paths.nextPaths, req, routedPaths)
             } catch (e) {
-                console.dir(e)
                 if (e.type === 'abort' && e.statusCode === 404) continue
-                console.log(route)
                 throw e
             }
         }
@@ -47,6 +53,7 @@ export class RoutingCollection implements IRoutingCollection {
     }
 
     private readonly matchRoute = (path: UnitPath): Routing | undefined => {
+        console.log('match routes', path.value)
         return this.routes.find(route => route.isPath(path))
     }
 
@@ -72,4 +79,15 @@ export class RoutingCollection implements IRoutingCollection {
             )
         )
     }
+
+    private readonly setWebSocket = (paths: Paths, middlewares: LMiddlewares, onUpgrade: WebSocketOnUpgrade): RoutingCollection => {
+        const guardedPaths = paths.isCurrent ? new Paths([UnitPath.root]) : paths
+        return new RoutingCollection(
+            this.routes.map(
+                routing => routing.isPath(guardedPaths.nextPath) ?
+                    routing.setWebSocketHandler(guardedPaths.nextPaths, middlewares, onUpgrade) : routing
+            )
+        )
+    }
+
 }

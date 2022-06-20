@@ -1,9 +1,15 @@
 import { Application } from "./application.ts"
-import { GroupedOverload, GroupOverload, HttpHandleOverload, LRoutesBuilder } from "../route/entity/lRoutesBuilder.ts"
+import {
+    GroupedOverload,
+    GroupOverload,
+    HttpHandleOverload,
+    LRoutesBuilder,
+    WebSocketHandlerOverload
+} from "../route/entity/lRoutesBuilder.ts"
 import { Middlewares } from "../middleware/middlewares.ts"
 import { LMiddlewares } from "../middleware/entity/middlewares/lMiddlewares.ts"
 import { RouteCollection } from "../route/routeCollection.ts"
-import { WebSocketOnUpgrade } from "../handler/webSocketOnUpgrade.ts"
+import { WebSocketOnUpgrade } from "../handler/socket/webSocketOnUpgrade.ts"
 import { HTTPMethod } from "../method/httpMethod.ts"
 import { HttpHandler } from "../handler/http/httpHandler.ts"
 import { Paths } from "../route/entity/path/collection/paths.ts"
@@ -11,6 +17,7 @@ import { Response } from "../response/response.ts"
 import { LRequest } from "../request/entity/lRequest.ts"
 import { Directory } from "../directory/directory.ts"
 import { LDirectory } from "../directory/lDirectory.ts"
+import { Protocol } from "../protocol/protocol.ts"
 
 export class LApplication implements Application {
 
@@ -56,11 +63,11 @@ export class LApplication implements Application {
         this.routesBuilder.register(collection)
     }
 
-    public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest): Promise<Response> => {
-        return await this.routesBuilder.handle(method, paths, req)
+    public readonly handle = async (protocol: Protocol, method: HTTPMethod, paths: Paths, req: LRequest): Promise<Response> => {
+        return await this.routesBuilder.handle(protocol, method, paths, req)
     }
 
-    public readonly webSocket = (paths: string[], onUpgrade: WebSocketOnUpgrade): void => {
-        return this.routesBuilder.webSocket(paths, onUpgrade)
+    public readonly webSocket: WebSocketHandlerOverload = (pathOrPathsOrOnUpgrade: string | string[] | WebSocketOnUpgrade, onUpgrade?: WebSocketOnUpgrade): void => {
+        return this.routesBuilder.webSocketRouting(pathOrPathsOrOnUpgrade, onUpgrade)
     }
 }

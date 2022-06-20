@@ -5,13 +5,17 @@ import { HTTPHeaders } from "../header/httpHeaders.ts";
 import { Route } from "../route/route.ts";
 import { Params } from "./entity/params/params.ts"
 import { Sessions } from "../session/sessions.ts"
+import { DenoRequest } from "./denoRequest.ts"
+import { Protocol } from "../protocol/protocol.ts"
 
 export interface Request {
     application: Application
     method: HTTPMethod
     url: URI
     headers: HTTPHeaders
-    route?: Route
+    protocol: Protocol
+    route?: Route,
+    denoRequest: DenoRequest
 
     get content(): string | Record<string | number, unknown>
     get query(): Record<string, string>

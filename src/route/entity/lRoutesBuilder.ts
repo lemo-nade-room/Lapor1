@@ -6,9 +6,10 @@ import { Paths } from "./path/collection/paths.ts"
 import { RouteCollection } from "../routeCollection.ts"
 import { LRouting } from "./lRouting.ts"
 import { LMiddlewares } from "../../middleware/entity/middlewares/lMiddlewares.ts"
-import { WebSocketOnUpgrade } from "../../handler/webSocketOnUpgrade.ts"
+import { WebSocketOnUpgrade } from "../../handler/socket/webSocketOnUpgrade.ts"
 import { Response } from "../../response/response.ts"
 import { LRequest } from "../../request/entity/lRequest.ts"
+import { Protocol } from "../../protocol/protocol.ts"
 
 export type GroupedOverload = {
     (use: Middleware): RoutesBuilder
@@ -24,6 +25,12 @@ export type HttpHandleOverload = {
     (paths: string[], handler: HttpHandler): void
     (path: string, handler: HttpHandler): void
     (handler: HttpHandler): void
+}
+
+export type WebSocketHandlerOverload = {
+    (paths: string[], onUpgrade: WebSocketOnUpgrade): void
+    (path: string, onUpgrade: WebSocketOnUpgrade): void
+    (onUpgrade: WebSocketOnUpgrade): void
 }
 
 export class LRoutesBuilder implements RoutesBuilder {
@@ -56,10 +63,18 @@ export class LRoutesBuilder implements RoutesBuilder {
         this.httpRoute(HTTPMethod.DELETE, pathOrPathsOrHandler, handler)
     }
 
-    public readonly webSocket = (paths: string[], onUpgrade: WebSocketOnUpgrade): void => {}
+    public readonly webSocketRouting = (pathOrPathsOrOnUpgrade: string | string[] | WebSocketOnUpgrade, onUpgrade?: WebSocketOnUpgrade): void => {
+        this.routing.setWebSocketHandler(
+            this.webSocketRoutePaths(pathOrPathsOrOnUpgrade, onUpgrade),
+            this.middlewares,
+            onUpgrade ?? pathOrPathsOrOnUpgrade as WebSocketOnUpgrade
+        )
+    }
 
-    public readonly handle = async (method: HTTPMethod, paths: Paths, req: LRequest): Promise<Response> => {
-        return await this.routing.handle(method, paths, req)
+    public readonly webSocket: WebSocketHandlerOverload = this.webSocketRouting
+
+    public readonly handle = async (protocol: Protocol, method: HTTPMethod, paths: Paths, req: LRequest): Promise<Response> => {
+        return await this.routing.handle(protocol, method, paths, req)
     }
 
     public readonly httpRoute = (method: HTTPMethod, pathOrPathsOrHandler: (string | string[] | HttpHandler), handler?: HttpHandler): void => {
@@ -94,6 +109,16 @@ export class LRoutesBuilder implements RoutesBuilder {
         }
         if (Array.isArray(pathOrPathsOrHandler) && handler) {
             return this.basedPaths(pathOrPathsOrHandler)
+        }
+        return this.basedPaths([])
+    }
+
+    private readonly webSocketRoutePaths = (pathOrPathsOrOnUpgrade: string | string[] | WebSocketOnUpgrade, onUpgrade?: WebSocketOnUpgrade): Paths => {
+        if (typeof pathOrPathsOrOnUpgrade === 'string' && onUpgrade) {
+            return this.basedPaths([pathOrPathsOrOnUpgrade])
+        }
+        if (Array.isArray(pathOrPathsOrOnUpgrade) && onUpgrade) {
+            return this.basedPaths(pathOrPathsOrOnUpgrade)
         }
         return this.basedPaths([])
     }

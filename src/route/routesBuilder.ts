@@ -1,6 +1,7 @@
 import { RouteCollection } from "./routeCollection.ts"
 import { Middleware } from "../middleware/middleware.ts"
 import { HttpHandler } from "../handler/http/httpHandler.ts"
+import { WebSocketOnUpgrade } from "../handler/socket/webSocketOnUpgrade.ts"
 
 export interface RoutesBuilder {
 
@@ -23,6 +24,10 @@ export interface RoutesBuilder {
     delete(paths: string[], handler: HttpHandler): void
     delete(path: string, handler: HttpHandler): void
     delete(handler: HttpHandler): void
+
+    webSocket(paths: string[], onUpgrade: WebSocketOnUpgrade): void
+    webSocket(path: string, onUpgrade: WebSocketOnUpgrade): void
+    webSocket(onUpgrade: WebSocketOnUpgrade): void
 
     register(collection: RouteCollection): void
 

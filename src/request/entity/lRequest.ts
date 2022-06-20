@@ -11,6 +11,8 @@ import { Directory } from "../../directory/directory.ts"
 import { LDirectory } from "../../directory/lDirectory.ts"
 import { Sessions } from "../../session/sessions.ts"
 import { LSessions } from "../../session/entity/lSessions.ts"
+import { DenoRequest } from "../denoRequest.ts"
+import { Protocol } from "../../protocol/protocol.ts"
 
 export class LRequest implements Request {
 
@@ -19,8 +21,10 @@ export class LRequest implements Request {
         public readonly headers: HTTPHeaders,
         public readonly method: HTTPMethod,
         public readonly url: URI,
+        public readonly protocol: Protocol = new Protocol('https:'),
         public readonly sessions: Sessions = new LSessions('', {}),
         public readonly directory: Directory = new LDirectory(),
+        public readonly denoRequest: DenoRequest = undefined as any,
         public _routedPaths?: Paths
     ) {}
 
