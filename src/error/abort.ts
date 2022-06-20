@@ -16,7 +16,7 @@ export class Abort extends Error {
     public static readonly notFound = new Abort(HttpStatus.notFound)
 
     public get response(): Response {
-        return this.httpStatus.response
+        return this.httpStatus.response()
     }
 
     public get statusCode(): number {

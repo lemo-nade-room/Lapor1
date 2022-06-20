@@ -1,4 +1,6 @@
-export class HttpStatus {
+import { Responsible } from "../response/responsible.ts"
+
+export class HttpStatus implements Responsible {
 
     private constructor(
         public readonly statusCode: number,
@@ -14,8 +16,11 @@ export class HttpStatus {
     public static readonly forbidden = new HttpStatus(403, 'forbidden')
     public static readonly notFound = new HttpStatus(404, 'Not Found')
 
-    public get response(): Response {
-        return new Response('', this.responseInit())
+
+    public readonly type = 'responsible'
+
+    public readonly response = (): Response => {
+        return new Response(null, this.responseInit())
     }
 
     private readonly responseInit = (): { headers?: HeadersInit, status?: number, statusText?: string } => {

@@ -25,7 +25,6 @@ const convertResponse = (lRes: LResponse): Response => {
     if (isResponsible(lRes)) {
         return (lRes as Responsible).response()
     }
-    if (lRes instanceof HttpStatus) return lRes.response
     return new Response(JSON.stringify(lRes))
 }
 
@@ -79,6 +78,7 @@ export type { Response } from './src/response/response.ts'
 export type { Request } from './src/request/request.ts'
 export type { Middleware } from './src/middleware/middleware.ts'
 export { Abort } from './src/error/abort.ts'
+export { HttpStatus } from './src/status/httpStatus.ts'
 export type { HttpHandler } from './src/handler/http/httpHandler.ts'
 export type { WebSocketOnUpgrade } from './src/handler/socket/webSocketOnUpgrade.ts'
 export type { RouteCollection } from './src/route/routeCollection.ts'
