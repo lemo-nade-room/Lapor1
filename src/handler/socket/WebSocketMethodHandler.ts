@@ -13,7 +13,6 @@ export class WebSocketMethodHandler {
     ) {}
 
     public readonly handle = async (req: Request): Promise<LResponse> => {
-        console.log('ws method handler handled')
         return await this.middlewares.handle(req, this.upgradeHandler)
     }
 
@@ -22,7 +21,6 @@ export class WebSocketMethodHandler {
         let socket: WebSocket;
         try {
             ({ response, socket } = Deno.upgradeWebSocket(req.denoRequest));
-            console.log(req.denoRequest)
         } catch {
             return "request isn't trying to upgrade to websocket."
         }

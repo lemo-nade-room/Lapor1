@@ -53,7 +53,6 @@ export class RoutingCollection implements IRoutingCollection {
     }
 
     private readonly matchRoute = (path: UnitPath): Routing | undefined => {
-        console.log('match routes', path.value)
         return this.routes.find(route => route.isPath(path))
     }
 

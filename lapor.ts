@@ -69,7 +69,7 @@ export const serve = async (configure: ((app: Application) => void)): Promise<vo
             if (e.type === 'abort') {
                 return e.response
             }
-            console.log(e)
+            console.trace(e)
             return HttpStatus.badRequest.response
         }
     })

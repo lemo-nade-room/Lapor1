@@ -24,11 +24,8 @@ export class LWebSocket implements IWebSocket {
     }
 
     public readonly send = (text: string): void => {
-        console.log('isClosed', this.isClosed)
         if (this.isClosed) return
-        console.log('send')
         this.socket.send(text)
-        console.log('sended')
     }
 
 }
