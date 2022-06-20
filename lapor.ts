@@ -56,7 +56,7 @@ export const serve = async (configure: ((app: Application) => void)): Promise<vo
             const protocol = new Protocol(req.headers.get('connection') === 'Upgrade' ? 'ws:' : 'http:')
             const uri = uriConverter.convert(pathname)
             const method = LHTTPMethod.read(req.method)
-            const request = new LRequest(app, new HTTPHeaders(), method, uri, protocol, sessions, app.directory, req)
+            const request = new LRequest(app, new HTTPHeaders(), method, uri, await req.json(), protocol, sessions, app.directory, req)
             const lRes = await app.handle(protocol, method, uri.paths, request)
 
             const response = convertResponse(lRes)

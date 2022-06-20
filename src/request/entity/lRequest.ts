@@ -21,6 +21,7 @@ export class LRequest implements Request {
         public readonly headers: HTTPHeaders,
         public readonly method: HTTPMethod,
         public readonly url: URI,
+        public readonly content: Record<string | number, unknown> = {},
         public readonly protocol: Protocol = new Protocol('https:'),
         public readonly sessions: Sessions = new LSessions('', {}),
         public readonly directory: Directory = new LDirectory(),
@@ -30,10 +31,6 @@ export class LRequest implements Request {
 
     get application(): Application {
         return this.lApplication
-    }
-
-    get content(): Record<string | number, unknown> {
-        return undefined as any;
     }
 
     get parameters(): Params {
