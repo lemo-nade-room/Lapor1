@@ -59,7 +59,6 @@ export class Routing {
     public readonly handle = async (protocol: Protocol, method: HTTPMethod, paths: Paths, req: LRequest, routedPaths: Paths): Promise<Response> => {
         if (this.isNextRouting(paths)) return await this.routingCollection.handle(protocol, method, paths, req, this.nextRoutedPaths(routedPaths))
         req._routedPaths = this.nextRoutedPaths(routedPaths)
-        console.dir(routedPaths)
         if (protocol.isWebsocket()) return this.webSocketHandle(req)
         return await this.handlers.handle(method, req)
     }

@@ -23,7 +23,6 @@ const isResponsible = (response: LResponse): boolean => {
 const convertResponse = (lRes: LResponse): Response => {
     if (typeof lRes === 'string') return new Response(lRes)
     if (isResponsible(lRes)) {
-        console.log('responsible')
         return (lRes as Responsible).response()
     }
     if (lRes instanceof HttpStatus) return lRes.response
