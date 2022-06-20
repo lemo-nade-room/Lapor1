@@ -7,6 +7,7 @@ import { Params } from "./entity/params/params.ts"
 import { Sessions } from "../session/sessions.ts"
 import { DenoRequest } from "./denoRequest.ts"
 import { Protocol } from "../protocol/protocol.ts"
+import { Directory } from "../directory/directory.ts"
 
 export interface Request {
     application: Application
@@ -17,7 +18,8 @@ export interface Request {
     route?: Route,
     denoRequest: DenoRequest
 
-    get content(): string | Record<string | number, unknown>
+    get directory(): Directory
+    get content(): Record<string | number, unknown>
     get query(): Record<string, string>
     get parameters(): Params
     get sessions(): Sessions
