@@ -4,22 +4,14 @@ export class LCookie {
         private readonly cookie: string
     ) {}
 
-    public get sessionId(): string | null {
-        return this.middleSessionId ?? this.endSessionId
-    }
-
     private get sessionKey(): string {
         return 'session_id='
     }
 
-    private get middleSessionId(): string | null {
-        const array = this.cookie.match(/session_id=(.*?);/)
-        return array ? array[1] : null
-    }
-
-    private get endSessionId(): string | null {
-        const index = this.cookie.indexOf(this.sessionKey)
-        if (index === -1) return null
-        return this.cookie.substring(index + this.sessionKey.length, this.cookie.length)
+    public get sessionId(): string | null {
+        const ids = this.cookie.split(';')
+            .filter(cookie => cookie.includes(this.sessionKey))
+            .map(cookie => cookie.substring(cookie.indexOf(this.sessionKey) + this.sessionKey.length, this.cookie.length))
+        return ids.pop() ?? null
     }
 }
