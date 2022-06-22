@@ -6,17 +6,16 @@ export class LWebSocket implements IWebSocket {
         private readonly socket: WebSocket
     ) {}
 
-    private isClosed = false
+    public get isClosed(): boolean {
+        return this.socket.readyState !== 1
+    }
 
     public readonly id = crypto.randomUUID()
 
     public readonly close = () => this.socket.close()
 
     public readonly onClose = (callback: () => Promise<void>): void => {
-        this.socket.onclose = async () => {
-            await callback()
-            this.isClosed = true
-        }
+        this.socket.onclose = callback
     }
 
     public readonly onText = (callback: (ws: LWebSocket, text: string) => Promise<void>): void => {
