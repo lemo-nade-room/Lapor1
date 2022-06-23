@@ -32,8 +32,11 @@ export class SessionStorage {
     private readonly timer = (key: string) => {
         setTimeout(() => {
             if (!this.sessions[key]) return
-            if (Date.now() - this.sessions[key].last > this.timeLimit) {
+            const elapsed = Date.now() - this.sessions[key].last
+            if (elapsed > this.timeLimit) {
                 delete this.sessions[key]
+                console.log('SESSIONが削除されました')
+                console.log('経過時間: ', Math.floor(elapsed / 1000 / 60))
             }
         }, this.timeLimit * 1.2)
     }
