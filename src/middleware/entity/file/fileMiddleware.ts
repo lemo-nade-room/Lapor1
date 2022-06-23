@@ -1,7 +1,7 @@
 import { Middleware } from "../../middleware.ts"
 import { HttpHandler } from "../../../handler/http/httpHandler.ts"
 import { Request } from "../../../request/request.ts"
-import { Response } from "../../../response/response.ts"
+import { Response } from 'https://github.com/lemo-nade-room/Lapor/raw/main/lapor.ts'
 import { serveDir } from "https://deno.land/std@0.138.0/http/file_server.ts";
 import { Abort } from "../../../error/abort.ts"
 
