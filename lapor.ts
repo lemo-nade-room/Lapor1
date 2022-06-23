@@ -30,7 +30,7 @@ const convertResponse = (lRes: LResponse): Response => {
 
 const addCookie = (res: Response, sessions: LSessions): Response => {
     try {
-        res.headers.set("Set-Cookie", `session_id=${sessions.uuid}; HttpOnly`)
+        res.headers.set("Set-Cookie", `session_id=${sessions.uuid}; HttpOnly; SameSite=Lax`)
         return res
     } catch (e) {
         return res

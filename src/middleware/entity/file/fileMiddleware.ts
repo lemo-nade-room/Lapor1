@@ -3,6 +3,7 @@ import { HttpHandler } from "../../../handler/http/httpHandler.ts"
 import { Request } from "../../../request/request.ts"
 import { Response } from "../../../response/response.ts"
 import { serveDir } from "https://deno.land/std@0.138.0/http/file_server.ts";
+import { Abort } from "../../../error/abort.ts"
 
 
 export class FileMiddleware implements Middleware {
@@ -13,6 +14,8 @@ export class FileMiddleware implements Middleware {
     }
 
     public readonly respond = async (req: Request, _next: HttpHandler): Promise<Response> => {
+        const response = await this.serveDirResponse(req)
+        if (response.status === 404) return { type: 'responsible', response: () => this.indexFile() }
         return {
             type: 'responsible',
             response: () => {
@@ -24,5 +27,20 @@ export class FileMiddleware implements Middleware {
                 });
             }
         }
+    }
+
+    private readonly indexFile = async () => {
+        const file = await Deno.readTextFile(this.baseDirectory + 'index.html')
+        if (!file) throw Abort.notFound
+        return new Response(file, { headers: {"Content-Type": "text/html; charset=utf-8"}})
+    }
+
+    private readonly serveDirResponse = (req: Request) => {
+        return serveDir(req.denoRequest, {
+            fsRoot: this.baseDirectory,
+            urlRoot: "",
+            showDirListing: true,
+            enableCors: true,
+        });
     }
 }
