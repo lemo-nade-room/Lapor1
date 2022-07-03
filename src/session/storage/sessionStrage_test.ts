@@ -14,6 +14,7 @@ Deno.test('createSession', () => {
         sessions.data['hello'],
         'world'
     )
+    storage.timerClear()
 })
 
 Deno.test('get', () => {
@@ -28,4 +29,5 @@ Deno.test('get', () => {
 
     assertStrictEquals(storage.get(nullKey).data['hello'], 'world')
     assertStrictEquals(storage.get(noKey).data['hello'], 'こんにちは')
+    storage.timerClear()
 })

@@ -7,6 +7,7 @@ export class SessionStorage {
     ) {}
 
     private readonly timeLimit = 20 * 60 * 1000
+    private readonly timers: number[] = []
 
     public readonly create = (): string => {
         const uuid = crypto.randomUUID()
@@ -30,7 +31,7 @@ export class SessionStorage {
     }
 
     private readonly timer = (key: string) => {
-        setTimeout(() => {
+        const timer = setTimeout(() => {
             if (!this.sessions[key]) return
             const elapsed = Date.now() - this.sessions[key].last
             if (elapsed > this.timeLimit) {
@@ -39,5 +40,12 @@ export class SessionStorage {
                 console.log('経過時間: ', Math.floor(elapsed / 1000 / 60))
             }
         }, this.timeLimit * 1.2)
+        this.timers.push(timer)
+    }
+
+    public readonly timerClear = (): void => {
+        for (const timer of this.timers) {
+            clearTimeout(timer)
+        }
     }
 }
